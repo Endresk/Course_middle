@@ -2,24 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class Book(models.Model):
-    title = models.CharField('Название книги', max_length=200)
-    author = models.CharField('Автор книги', max_length=100)
-    publication_type = models.CharField('Вид издания', max_length=50)
-    number = models.PositiveIntegerField("Номер книги")
-    page_count = models.PositiveSmallIntegerField('Количество страниц')
-    publication_date = models.DateField("Дата издания")
-    description = models.TextField("Описание")
-
-    class Meta:
-        ordering = ['title']
-        verbose_name = 'Книга'
-        verbose_name_plural = 'Книги'
-
-
 class Hall(models.Model):
     name = models.CharField('Название зала', max_length=100)
-    books = models.ManyToManyField(Book, through='BookLocation')
     librarian = models.ForeignKey(User, verbose_name="Библиотекарь", on_delete=models.CASCADE)
 
     class Meta:
@@ -47,6 +31,22 @@ class Shelve(models.Model):
         unique_together = ('number', 'rack')
 
 
+class Book(models.Model):
+    title = models.CharField('Название книги', max_length=200)
+    authors = models.ManyToManyField(User, 'Авторы книги', max_length=100)
+    publication_type = models.CharField('Вид издания', max_length=50)
+    number = models.PositiveIntegerField("Номер издания")
+    page_count = models.PositiveSmallIntegerField('Количество страниц')
+    publication_date = models.DateField("Дата издания")
+    description = models.TextField("Описание")
+    shelve = models.ForeignKey(Shelve, verbose_name="Полка", null=True, blank=True, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['title']
+        verbose_name = 'Книга'
+        verbose_name_plural = 'Книги'
+
+
 class Reader(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     borrowed_books = models.ManyToManyField(Book)
@@ -59,7 +59,6 @@ class Reader(models.Model):
 
 class BookLocation(models.Model):
     book = models.ForeignKey(Book, verbose_name="Книга", on_delete=models.CASCADE)
-    hall = models.ForeignKey(Hall, verbose_name="Зал", on_delete=models.CASCADE)
     shelve = models.ForeignKey(Shelve, verbose_name="Полка", on_delete=models.CASCADE)
     status = models.CharField('Статус', max_length=20,
                               choices=[('hall', 'В зале'), ('outside', 'Вне библиотеки')],

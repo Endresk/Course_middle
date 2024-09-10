@@ -1,5 +1,5 @@
 """
-WSGI config for task_2 project.
+WSGI config for structure project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task_2.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'structure.settings')
 
 application = get_asgi_application()
