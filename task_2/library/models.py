@@ -33,7 +33,7 @@ class Shelve(models.Model):
 
 class Book(models.Model):
     title = models.CharField('Название книги', max_length=200)
-    authors = models.ManyToManyField(User, 'Авторы книги', max_length=100)
+    authors = models.ManyToManyField(User, related_name='books', verbose_name='Авторы книги', max_length=100)
     publication_type = models.CharField('Вид издания', max_length=50)
     number = models.PositiveIntegerField("Номер издания")
     page_count = models.PositiveSmallIntegerField('Количество страниц')
