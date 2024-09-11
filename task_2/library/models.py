@@ -7,6 +7,7 @@ class Hall(models.Model):
     librarian = models.ForeignKey(User, verbose_name="Библиотекарь", on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "hall"
         verbose_name = 'Зал'
         verbose_name_plural = 'Залы'
 
@@ -16,6 +17,7 @@ class Rack(models.Model):
     hall = models.ForeignKey(Hall, verbose_name="Зал", on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "rack"
         verbose_name = 'Стеллаж'
         verbose_name_plural = 'Стеллажи'
         unique_together = ('number', 'hall')
@@ -26,6 +28,7 @@ class Shelve(models.Model):
     rack = models.ForeignKey(Rack, verbose_name="Стеллаж", on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "shelve"
         verbose_name = 'Полка'
         verbose_name_plural = 'Полки'
         unique_together = ('number', 'rack')
@@ -42,6 +45,7 @@ class Book(models.Model):
     shelve = models.ForeignKey(Shelve, verbose_name="Полка", null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "book"
         ordering = ['title']
         verbose_name = 'Книга'
         verbose_name_plural = 'Книги'
@@ -53,6 +57,7 @@ class Reader(models.Model):
     registration_date = models.DateTimeField("Дата регистрация читателя", auto_now_add=True)
 
     class Meta:
+        db_table = "reader"
         verbose_name = 'Читатель'
         verbose_name_plural = 'Читатели'
 
@@ -66,6 +71,7 @@ class BookLocation(models.Model):
     date_moved = models.DateTimeField('Дата перемещения', auto_now_add=True)
 
     class Meta:
+        db_table = "book_location"
         verbose_name = 'Местоположение книги'
         verbose_name_plural = 'Местоположения книг'
 
@@ -81,5 +87,6 @@ class Borrow(models.Model):
     date_returned = models.DateTimeField("Дата возвращения книги", null=True, blank=True)
 
     class Meta:
+        db_table = "borrow"
         verbose_name = 'Аренда'
         verbose_name_plural = 'Аренды'
