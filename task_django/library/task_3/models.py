@@ -225,7 +225,7 @@ popular_books_ten = borrow.values('book').annotate(Count("book")).order_by('-cou
 
 
 # Количество книг, которые сейчас находятся на руках в разрезе читателей
-Borrow.objects.filter(status='on_your_hands').values('reader')
+Borrow.objects.filter(status='on_your_hands').values('reader').annotate(Count("book"))
 
 
 # Перечень читателей, которые просрочили возврат книг
