@@ -231,12 +231,14 @@ for book in sorted_books:
 try:
     borrow_record.save()
     print(f'Книга "{book.title}" успешно взята.')
+
+    # Возврат книги
+    borrow_record.return_book()
+    print(f'Книга "{book.title}" успешно возвращена.')
 except ValidationError as e:
     print(e)
 
-# Возврат книги
-borrow_record.return_book()
-print(f'Книга "{book.title}" успешно возвращена.')
+
 
 # Количество книг определенного автора в библиотеке
 Book.objects.filter(authors='Автор 1').count()
