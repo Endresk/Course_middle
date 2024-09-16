@@ -145,7 +145,7 @@ class Borrow(models.Model):
                 _shelves = Shelve.objects.filter(rack=_rack)
                 for _shelve in _shelves:
                     if not Book.objects.filter(shelve=_shelve).exists():
-                        self.book.shelve = shelve
+                        self.book.shelve = _shelve
                         self.book.save()
                         return
 
