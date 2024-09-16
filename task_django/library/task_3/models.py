@@ -211,10 +211,10 @@ for hall_number in range(1, 4):  # 3 зала
 # Получаем книгу
 book = Book.objects.get(id=1)
 # Получаем другую полку
-_shelve = Shelve.objects.get(id=2)
+shelve = Shelve.objects.get(id=2)
 
 # Перемещаем книгу
-book.move_to(_shelve)
+book.move_to(shelve)
 
 reader = Reader.objects.get(user__fio='reader 1')
 
