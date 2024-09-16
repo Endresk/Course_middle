@@ -176,7 +176,7 @@ for hall_number in range(1, 4):  # 3 зала
 
             for book_number in range(1, 11):  # 10 книг на полке
                 Book.objects.create(
-                    title=f'Книга {hall_number} {rack_number} {shelve_number} {book_number}',
+                    title=f'Книга {hall_number}.{rack_number}.{shelve_number}.{book_number}',
                     author=f'Автор {book_number}',
                     shelve=shelve)
                 Book.save()
