@@ -149,7 +149,8 @@ class Borrow(models.Model):
                         self.book.save()
                         return
 
-    def sort_books(self):
+    @staticmethod
+    def sort_books():
         return Book.objects.all().order_by('publication_type', 'title', 'publication_date', 'page_count')
 
     def return_book(self):
@@ -181,7 +182,6 @@ for hall_number in range(1, 4):  # 3 зала
                     shelve=shelve)
                 Book.save()
 
-
 # Получаем книгу
 book = Book.objects.get(id=1)
 # Получаем другую полку
@@ -208,15 +208,12 @@ try:
 except ValidationError as e:
     print(e)
 
-
 # Возврат книги
 borrow_record.return_book()
 print(f'Книга "{book.title}" успешно возвращена.')
 
-
 # Количество книг определенного автора в библиотеке
 Book.objects.filter(authors='Автор 1').count()
-
 
 # Периодически библиотекарям требуется сборка следующих отчетов
 
@@ -226,22 +223,17 @@ borrow = Borrow.objects.filter(date_borrowed__gte=thirty_day)
 # 10 самых популярных книг за последний месяц
 popular_books_ten = borrow.values('book').annotate(Count("book")).order_by('-count')[:10]
 
-
 # Количество книг, которые сейчас находятся на руках в разрезе читателей
 Borrow.objects.filter(status='on_your_hands').values('reader').annotate(Count("book"))
-
 
 # Перечень читателей, которые просрочили возврат книг
 Borrow.objects.filter(status='on_your_hands', date_borrowed__lt=thirty_day).values('reader').distinct()
 
-
 # 10 самых активных читателей, которые взяли больше всего книг, за прошедший месяц
 active_reader_ten = borrow.values('reader').annotate(Count("book")).order_by('-count')[:10]
 
-
 # Среднее количество страниц в разрезе видов изданий, которые прочитали читатели за последний месяц
 average_page_count = borrow.values('book__publication_type').annotate(Avg('book__page_count'))
-
 
 # 10 самых перемещаемых книг за последний месяц
 book_location = BookLocation.objects.filter(date_moved__gte=thirty_day)
