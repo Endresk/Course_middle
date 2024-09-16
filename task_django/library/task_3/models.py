@@ -8,9 +8,9 @@ from django.utils import timezone
 
 
 class Agents(models.Model):
-    fio = models.CharField(max_length=255)
-    birth_date = models.DateField(blank=True, null=True)
-    sex = models.BooleanField()
+    fio = models.CharField("ФИО", max_length=255)
+    birth_date = models.DateField(verbose_name="Дата рождения", blank=True, null=True)
+    sex = models.BooleanField(verbose_name="Пол")
 
     def __str__(self):
         return f"{self.fio}"
@@ -146,7 +146,7 @@ class Borrow(models.Model):
     date_returned = models.DateTimeField("Дата возвращения книги", null=True, blank=True)
 
     def __str__(self):
-        return f"{self.book.title} - {self.reader.user.username}"
+        return f"{self.book.title} - {self.reader.user.fio}"
 
     class Meta:
         db_table = "borrow"
