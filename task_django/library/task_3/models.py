@@ -7,9 +7,36 @@ from django.db.models import Count, Avg
 from django.utils import timezone
 
 
+class Agents(models.Model):
+    fio = models.CharField(max_length=255)
+    birth_date = models.DateField(blank=True, null=True)
+    sex = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.fio}"
+
+    class Meta:
+        db_table = "agents"
+        verbose_name = 'Контрагент'
+        verbose_name_plural = 'Контрагенты'
+
+
+class Authors(models.Model):
+    user = models.OneToOneField(Agents, verbose_name="Автор", on_delete=models.PROTECT)
+    biography = models.TextField(verbose_name="Биография>", blank=True)
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = 'Authors'
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
+
+
 class Hall(models.Model):
     name = models.CharField('Название зала', max_length=100)
-    librarian = models.ForeignKey(User, verbose_name="Библиотекарь", on_delete=models.PROTECT)
+    librarian = models.ForeignKey(Agents, verbose_name="Библиотекарь", on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -50,7 +77,7 @@ class Shelve(models.Model):
 
 class Book(models.Model):
     title = models.CharField('Название книги', max_length=200)
-    authors = models.ManyToManyField(User, verbose_name='Авторы книги', max_length=100)
+    authors = models.ManyToManyField(Agents, verbose_name='Авторы книги', max_length=100)
     publication_type = models.CharField('Вид издания', max_length=50)
     number = models.PositiveIntegerField("Номер издания")
     page_count = models.PositiveSmallIntegerField('Количество страниц')
@@ -78,7 +105,7 @@ class Book(models.Model):
 
 
 class Reader(models.Model):
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.OneToOneField(Agents, on_delete=models.PROTECT)
     borrowed_books = models.ManyToManyField(Book)
     registration_date = models.DateTimeField("Дата регистрация читателя", auto_now_add=True)
 
@@ -163,7 +190,7 @@ class Borrow(models.Model):
 
 for hall_number in range(1, 4):  # 3 зала
 
-    librarian = User.objects.create_user(username=f'librarian {hall_number}')
+    librarian = Agents.objects.create_user(username=f'librarian {hall_number}')
     hall = Hall.objects.create(name=f'Зал {hall_number}', librarian=librarian)
     hall.save()
 
@@ -190,7 +217,7 @@ _shelve = Shelve.objects.get(id=2)
 # Перемещаем книгу
 book.move_to(_shelve)
 
-reader = Reader.objects.get(user__username='reader 1')
+reader = Reader.objects.get(user__fio='reader 1')
 
 book_location = BookLocation.objects.get(id=1)
 
