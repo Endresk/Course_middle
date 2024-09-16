@@ -239,7 +239,6 @@ except ValidationError as e:
     print(e)
 
 
-
 # Количество книг определенного автора в библиотеке
 Book.objects.filter(authors='Автор 1').count()
 
