@@ -239,13 +239,13 @@ except ValidationError as e:
     print(e)
 
 
-# Количество книг определенного автора в библиотеке
-Book.objects.filter(authors='Автор 1').count()
-
 # Периодически библиотекарям требуется сборка следующих отчетов
 
 thirty_day = timezone.now() - timedelta(days=30)
 borrow = Borrow.objects.filter(date_borrowed__gte=thirty_day)
+
+# Количество книг определенного автора в библиотеке
+Book.objects.filter(authors='Автор 1').count()
 
 # 10 самых популярных книг за последний месяц
 popular_books_ten = borrow.values('book').annotate(Count("book")).order_by('-count')[:10]
