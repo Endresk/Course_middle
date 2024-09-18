@@ -264,4 +264,4 @@ average_page_count = borrow.values('book__publication_type').annotate(Avg('book_
 
 # 10 самых перемещаемых книг за последний месяц
 book_location = BookLocation.objects.filter(date_moved__gte=thirty_day)
-moved_ten = book_location.values('book').annotate(Count("book")).order_by('-count')[:10]
+moved_ten = book_location.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
