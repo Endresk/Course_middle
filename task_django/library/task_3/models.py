@@ -248,16 +248,16 @@ borrow = Borrow.objects.filter(date_borrowed__gte=thirty_day)
 Book.objects.filter(authors='Автор 1').count()
 
 # 10 самых популярных книг за последний месяц
-popular_books_ten = borrow.values('book').annotate(Count("book")).order_by('-count')[:10]
+popular_books_ten = borrow.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
 # Количество книг, которые сейчас находятся на руках в разрезе читателей
-Borrow.objects.filter(status='on_your_hands').values('reader').annotate(Count("book"))
+Borrow.objects.filter(status='on_your_hands').values(reader_book='reader').annotate(Count("reader_book"))
 
 # Перечень читателей, которые просрочили возврат книг
 Borrow.objects.filter(status='on_your_hands', date_borrowed__lt=thirty_day).values('reader').distinct()
 
 # 10 самых активных читателей, которые взяли больше всего книг, за прошедший месяц
-active_reader_ten = borrow.values('reader').annotate(Count("book")).order_by('-count')[:10]
+active_reader_ten = borrow.values('reader').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
 # Среднее количество страниц в разрезе видов изданий, которые прочитали читатели за последний месяц
 average_page_count = borrow.values('book__publication_type').annotate(Avg('book__page_count'))
