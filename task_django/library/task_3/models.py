@@ -175,8 +175,8 @@ class Borrow(models.Model):
                         self.book.save()
                         return
 
-    @staticmethod
-    def sort_books():
+    @classmethod
+    def sort_books(cls):
         return Book.objects.all().order_by('publication_type', 'title', 'publication_date', 'page_count')
 
     def return_book(self):
@@ -186,82 +186,113 @@ class Borrow(models.Model):
         self.book.save()
         self.save()
 
+    """
+    
+    Отчеты:
+    
+    """
+    @classmethod
+    def thirty_day(cls):
+        return timezone.now() - timedelta(days=30)
 
-for hall_number in range(1, 4):  # 3 зала
+    def borrow(self):
+        return Borrow.objects.filter(date_borrowed__gte=self.thirty_day())
 
-    librarian = Agents.objects.create_user(username=f'librarian {hall_number}')
-    hall = Hall.objects.create(name=f'Зал {hall_number}', librarian=librarian)
-    hall.save()
+    @classmethod
+    def num_books_author_library(cls):
+        # Количество книг определенного автора в библиотеке
+        return Book.objects.filter(authors='Автор 1').count()
 
-    for rack_number in range(1, 6):  # 5 стеллажей
-        rack = Rack.objects.create(number=rack_number, hall=hall)
-        rack.save()
+    def most_popular_books_last_month(self):
+        # 10 самых популярных книг за последний месяц
+        return self.borrow().values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
-        for shelve_number in range(1, 7):  # 6 полок на стеллаже
-            shelve = Shelve.objects.create(number=shelve_number, rack=rack)
-            shelve.save()
+    def num_books_currently_hand_readers(self):
+        # Количество книг, которые сейчас находятся на руках в разрезе читателей
+        return self.borrow().objects.filter(status='on_your_hands').values(
+            reader_book='reader').annotate(Count("reader_book"))
 
-            for book_number in range(1, 11):  # 10 книг на полке
-                book = Book.objects.create(
-                    title=f'Книга {hall_number}.{rack_number}.{shelve_number}.{book_number}',
-                    author=f'Автор {book_number}',
-                    shelve=shelve)
-                book.save()
+    def list_readers_who_overdue_book_returns(self):
+        # Перечень читателей, которые просрочили возврат книг
+        return Borrow.objects.filter(
+            status='on_your_hands',
+            date_borrowed__lt=self.thirty_day()).values('reader').distinct()
 
-# Получаем книгу
-book = Book.objects.get(id=1)
-# Получаем другую полку
-shelve = Shelve.objects.get(id=2)
+    def most_active_readers_who_books_past_month(self):
+        # 10 самых активных читателей, которые взяли больше всего книг, за прошедший месяц
+        return self.borrow().values('reader').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
-# Перемещаем книгу
-book.move_to(shelve)
+    def average_num_pages_types_publications_read_by_readers_last_month(self):
+        # Среднее количество страниц в разрезе видов изданий, которые прочитали читатели за последний месяц
+        return self.borrow().values('book__publication_type').annotate(Avg('book__page_count'))
 
-reader = Reader.objects.get(user__fio='reader 1')
-
-book_location = BookLocation.objects.get(id=1)
-
-borrow_record = Borrow(book=book, reader=reader, book_location=book_location)
-
-# Сортировка книг
-sorted_books = borrow_record.sort_books()
-for book in sorted_books:
-    print(book.title)
-
-# Попытка взять книгу
-try:
-    borrow_record.save()
-    print(f'Книга "{book.title}" успешно взята.')
-
-    # Возврат книги
-    borrow_record.return_book()
-    print(f'Книга "{book.title}" успешно возвращена.')
-except ValidationError as e:
-    print(e)
+    def most_moved_books_last_month(self):
+        # 10 самых перемещаемых книг за последний месяц
+        book_location = BookLocation.objects.filter(date_moved__gte=self.thirty_day())
+        return book_location.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
 
-# Периодически библиотекарям требуется сборка следующих отчетов
+class Fills:
+    @classmethod
+    def create(cls):
+        for hall_number in range(1, 4):  # 3 зала
 
-thirty_day = timezone.now() - timedelta(days=30)
-borrow = Borrow.objects.filter(date_borrowed__gte=thirty_day)
+            librarian = Agents.objects.create_user(username=f'librarian {hall_number}')
+            hall = Hall.objects.create(name=f'Зал {hall_number}', librarian=librarian)
+            hall.save()
 
-# Количество книг определенного автора в библиотеке
-Book.objects.filter(authors='Автор 1').count()
+            for rack_number in range(1, 6):  # 5 стеллажей
+                rack = Rack.objects.create(number=rack_number, hall=hall)
+                rack.save()
 
-# 10 самых популярных книг за последний месяц
-popular_books_ten = borrow.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
+                for shelve_number in range(1, 7):  # 6 полок на стеллаже
+                    shelve = Shelve.objects.create(number=shelve_number, rack=rack)
+                    shelve.save()
 
-# Количество книг, которые сейчас находятся на руках в разрезе читателей
-Borrow.objects.filter(status='on_your_hands').values(reader_book='reader').annotate(Count("reader_book"))
+                    for book_number in range(1, 11):  # 10 книг на полке
+                        book = Book.objects.create(
+                            title=f'Книга {hall_number}.{rack_number}.{shelve_number}.{book_number}',
+                            author=f'Автор {book_number}',
+                            shelve=shelve)
+                        book.save()
 
-# Перечень читателей, которые просрочили возврат книг
-Borrow.objects.filter(status='on_your_hands', date_borrowed__lt=thirty_day).values('reader').distinct()
+    @classmethod
+    def get_book(cls):
+        # Получаем книгу
+        return Book.objects.get(id=1)
 
-# 10 самых активных читателей, которые взяли больше всего книг, за прошедший месяц
-active_reader_ten = borrow.values('reader').annotate(book_count=Count("book")).order_by('-book_count')[:10]
+    @classmethod
+    def get_shelve(cls):
+        # Получаем полку
+        return Shelve.objects.get(id=2)
 
-# Среднее количество страниц в разрезе видов изданий, которые прочитали читатели за последний месяц
-average_page_count = borrow.values('book__publication_type').annotate(Avg('book__page_count'))
+    @classmethod
+    def moving_book(cls, book, shelve):
+        # Перемещаем книгу
+        book.move_to(shelve)
 
-# 10 самых перемещаемых книг за последний месяц
-book_location = BookLocation.objects.filter(date_moved__gte=thirty_day)
-moved_ten = book_location.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
+    @classmethod
+    def get_reader(cls, book):
+        return Borrow(book=book,
+                      reader=Reader.objects.get(user__fio='reader 1'),
+                      book_location=BookLocation.objects.get(id=1))
+
+    @classmethod
+    def _sort_books(cls, borrow_record):
+        # Сортировка книг
+        sorted_books = borrow_record.sort_books()
+        for book in sorted_books:
+            print(book.title)
+
+    @classmethod
+    def take_book(cls, borrow_record, book):
+
+        # Попытка взять книгу
+        borrow_record.save()
+        print(f'Книга "{book.title}" успешно взята.')
+
+    @classmethod
+    def _return_book(cls,  borrow_record, book):
+        # Возврат книги
+        borrow_record.return_book()
+        print(f'Книга "{book.title}" успешно возвращена.')
