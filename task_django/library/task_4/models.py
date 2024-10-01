@@ -286,36 +286,33 @@ class Report4:
 
         books_movement_history = Book.objects.filter(booklocation__isnull=False).distinct()
 
-        shelve_alphabet, shelve_chronology, summary = [], [], {}
+        summary = {}
 
         for book in books_movement_history:
+            summary[book.title] = {}
             if self.shelves_alphabet:
-                shelve_alphabet.append(
-                    ', '.join(
-                        map(
-                            str,
-                            sorted(book.booklocation_set.values_list('shelve__number', flat=True))
+                summary[book.title].update(
+                    {
+                        'алфавитный': ', '.join(
+                            map(
+                                str,
+                                sorted(book.booklocation_set.values_list('shelve__number', flat=True))
+                            )
                         )
-                    )
+                    }
                 )
-
-                summary[book.title] = {
-                    'алфавитный': shelve_alphabet
-                }
 
             if self.shelves_chronology:
-                shelve_chronology.append(
-                    ', '.join(
-                        map(
-                            str,
-                            book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
+                summary[book.title].update(
+                    {
+                        'хронологический': ', '.join(
+                            map(
+                                str,
+                                book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
+                            )
                         )
-                    )
+                    }
                 )
-
-                summary[book.title] = {
-                    'хронологический': shelve_chronology
-                }
 
         if summary:
             return [f"{k} {v}" for k, v in summary.items()]
