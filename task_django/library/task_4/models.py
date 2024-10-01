@@ -246,6 +246,7 @@ class Report3:
 
 class Report4:
     def __init__(self):
+        super().__init__()
         self.shelves_alphabet = True
         self.shelves_chronology = True
 
