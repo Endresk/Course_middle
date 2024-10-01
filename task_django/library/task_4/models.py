@@ -186,11 +186,15 @@ class Borrow(models.Model):
         self.book.save()
         self.save()
 
-    """
-    
-    Отчеты 3 задания:
-    
-    """
+
+"""
+
+Отчеты 3 задания:
+
+"""
+
+
+class Report3:
 
     @classmethod
     def thirty_day(cls):
@@ -232,11 +236,18 @@ class Borrow(models.Model):
         book_location = BookLocation.objects.filter(date_moved__gte=self.thirty_day())
         return book_location.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
 
-    """
 
-    Отчеты 4 задания:
+"""
 
-    """
+Отчеты 4 задания:
+
+"""
+
+
+class Report4:
+    def __init__(self):
+        self.shelves_alphabet = True
+        self.shelves_chronology = True
 
     @classmethod
     def get_halls_with_racks_and_shelves(cls):
@@ -268,8 +279,7 @@ class Borrow(models.Model):
             borrow_count=Count('borrow')).filter(
             borrow_count=0).values('publication_type', 'title')
 
-    @classmethod
-    def get_output_list_book(cls, shelves_alphabet: bool = True, shelves_chronology: bool = True):
+    def get_output_list_book(self):
         # Вывести список всех книг, у каждой из книг должна быть история перемещения между полками с наименованием
         # каждой из них: один атрибут - полки в алфавитном порядке, второй атрибут - в хронологическом.
 
@@ -278,11 +288,11 @@ class Borrow(models.Model):
         shelve_alphabet, shelve_chronology, summary = [], [], {}
 
         for book in books_movement_history:
-            if shelves_alphabet:
+            if self.shelves_alphabet:
                 sorted_ = sorted(book.booklocation_set.values_list('shelve__number', flat=True))
                 shelve_alphabet.append(', '.join(map(str, sorted_)))
 
-            if shelves_chronology:
+            if self.shelves_chronology:
                 sorted_ = book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
                 shelve_chronology.append(', '.join(map(str, sorted_)))
 
@@ -291,7 +301,7 @@ class Borrow(models.Model):
                 'хронологический': shelve_chronology
             }
 
-        return summary
+        return [f"{k} {v}" for k, v in summary.items()]
 
 
 class Fills:
