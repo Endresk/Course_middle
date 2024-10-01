@@ -301,8 +301,9 @@ class Report4:
                 'алфавитный': shelve_alphabet,
                 'хронологический': shelve_chronology
             }
-
-        return [f"{k} {v}" for k, v in summary.items()]
+        if summary:
+            return [f"{k} {v}" for k, v in summary.items()]
+        return []
 
 
 class Fills:
