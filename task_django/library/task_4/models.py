@@ -269,7 +269,7 @@ class Borrow(models.Model):
             borrow_count=0).values('publication_type', 'title')
 
     @classmethod
-    def get_output_list_book(cls, shelves_alphabet: bool = False, shelves_chronology: bool = False):
+    def get_output_list_book(cls, shelves_alphabet: bool = True, shelves_chronology: bool = True):
         # Вывести список всех книг, у каждой из книг должна быть история перемещения между полками с наименованием
         # каждой из них: один атрибут - полки в алфавитном порядке, второй атрибут - в хронологическом.
 
