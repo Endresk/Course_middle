@@ -303,7 +303,6 @@ class Report4:
                 )
 
             if self.shelves_chronology:
-
                 summary[book.title].update(
                     {
                         'хронологический': list(
