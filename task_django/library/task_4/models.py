@@ -290,12 +290,24 @@ class Report4:
 
         for book in books_movement_history:
             if self.shelves_alphabet:
-                sorted_ = sorted(book.booklocation_set.values_list('shelve__number', flat=True))
-                shelve_alphabet.append(', '.join(map(str, sorted_)))
+                shelve_alphabet.append(
+                    ', '.join(
+                        map(
+                            str,
+                            sorted(book.booklocation_set.values_list('shelve__number', flat=True))
+                        )
+                    )
+                )
 
             if self.shelves_chronology:
-                sorted_ = book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
-                shelve_chronology.append(', '.join(map(str, sorted_)))
+                shelve_chronology.append(
+                    ', '.join(
+                        map(
+                            str,
+                            book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
+                        )
+                    )
+                )
 
             summary[book.title] = {
                 'алфавитный': shelve_alphabet,
