@@ -293,7 +293,7 @@ class Report4:
             if self.shelves_alphabet:
                 summary[book.title].update(
                     {
-                        'алфавитный': ', '.join(
+                        'алфавитный': list(
                             map(
                                 str,
                                 sorted(book.booklocation_set.values_list('shelve__number', flat=True))
@@ -303,9 +303,10 @@ class Report4:
                 )
 
             if self.shelves_chronology:
+
                 summary[book.title].update(
                     {
-                        'хронологический': ', '.join(
+                        'хронологический': list(
                             map(
                                 str,
                                 book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
