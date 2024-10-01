@@ -275,21 +275,23 @@ class Borrow(models.Model):
 
         books_movement_history = Book.objects.filter(booklocation__isnull=False).distinct()
 
-        shelve_alphabet, shelve_chronology = [], []
+        shelve_alphabet, shelve_chronology, summary = [], [], {}
 
         for book in books_movement_history:
             if shelves_alphabet:
                 sorted_ = sorted(book.booklocation_set.values_list('shelve__number', flat=True))
-                shelve_alphabet.append(f"Название книги: {book.title}: {', '.join(map(str, sorted_))}")
+                shelve_alphabet.append(', '.join(map(str, sorted_)))
 
             if shelves_chronology:
                 sorted_ = book.booklocation_set.order_by('date_moved').values_list('shelve__number', flat=True)
-                shelve_chronology.append(f"Название книги: {book.title}: {', '.join(map(str, sorted_))}")
+                shelve_chronology.append(', '.join(map(str, sorted_)))
 
-        return {
-            'алфавитный': shelve_alphabet,
-            'хронологический': shelve_chronology
-        }
+            summary[book.title] = {
+                'алфавитный': shelve_alphabet,
+                'хронологический': shelve_chronology
+            }
+
+        return summary
 
 
 class Fills:
