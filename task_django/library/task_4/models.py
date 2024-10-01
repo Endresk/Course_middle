@@ -298,6 +298,9 @@ class Report4:
                         )
                     )
                 )
+                summary[book.title] = {
+                    'алфавитный': shelve_alphabet
+                }
 
             if self.shelves_chronology:
                 shelve_chronology.append(
@@ -309,10 +312,9 @@ class Report4:
                     )
                 )
 
-            summary[book.title] = {
-                'алфавитный': shelve_alphabet,
-                'хронологический': shelve_chronology
-            }
+                summary[book.title] = {
+                    'хронологический': shelve_chronology
+                }
         if summary:
             return [f"{k} {v}" for k, v in summary.items()]
         return []
