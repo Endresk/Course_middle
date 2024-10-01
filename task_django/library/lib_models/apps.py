@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class LibraryConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'library.task_2'
+    name = 'task_django.library.lib_models'

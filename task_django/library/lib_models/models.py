@@ -1,8 +1,7 @@
-from datetime import timedelta
+from datetime import datetime
 
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.db.models import Count, Avg
 from django.utils import timezone
 
 
@@ -28,7 +27,7 @@ class Authors(models.Model):
         return f"{self.user}"
 
     class Meta:
-        db_table = 'Authors'
+        db_table = 'authors'
         verbose_name = 'Автор'
         verbose_name_plural = 'Авторы'
 
@@ -91,7 +90,7 @@ class Book(models.Model):
     def move_to(self, shelve_new):
         BookLocation.objects.create(
             book=self,
-            shelve=shelve_new.rack.hall
+            shelve=shelve_new
         )
         self.shelve = shelve_new
         self.save()
@@ -186,58 +185,13 @@ class Borrow(models.Model):
         self.book.save()
         self.save()
 
-    """
-    
-    Отчеты:
-    
-    """
-    @classmethod
-    def thirty_day(cls):
-        return timezone.now() - timedelta(days=30)
-
-    def borrow(self):
-        return Borrow.objects.filter(date_borrowed__gte=self.thirty_day())
-
-    @classmethod
-    def num_books_author_library(cls):
-        # Количество книг определенного автора в библиотеке
-        return Book.objects.filter(authors='Автор 1').count()
-
-    def most_popular_books_last_month(self):
-        # 10 самых популярных книг за последний месяц
-        return self.borrow().values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
-
-    def num_books_currently_hand_readers(self):
-        # Количество книг, которые сейчас находятся на руках в разрезе читателей
-        return self.borrow().objects.filter(status='on_your_hands').values(
-            reader_book='reader').annotate(Count("reader_book"))
-
-    def list_readers_who_overdue_book_returns(self):
-        # Перечень читателей, которые просрочили возврат книг
-        return Borrow.objects.filter(
-            status='on_your_hands',
-            date_borrowed__lt=self.thirty_day()).values('reader').distinct()
-
-    def most_active_readers_who_books_past_month(self):
-        # 10 самых активных читателей, которые взяли больше всего книг, за прошедший месяц
-        return self.borrow().values('reader').annotate(book_count=Count("book")).order_by('-book_count')[:10]
-
-    def average_num_pages_types_publications_read_by_readers_last_month(self):
-        # Среднее количество страниц в разрезе видов изданий, которые прочитали читатели за последний месяц
-        return self.borrow().values('book__publication_type').annotate(Avg('book__page_count'))
-
-    def most_moved_books_last_month(self):
-        # 10 самых перемещаемых книг за последний месяц
-        book_location = BookLocation.objects.filter(date_moved__gte=self.thirty_day())
-        return book_location.values('book').annotate(book_count=Count("book")).order_by('-book_count')[:10]
-
 
 class Fills:
     @classmethod
     def create(cls):
         for hall_number in range(1, 4):  # 3 зала
 
-            librarian = Agents.objects.create_user(username=f'librarian {hall_number}')
+            librarian = Agents.objects.create(fio=f'librarian {hall_number}', sex=True)
             hall = Hall.objects.create(name=f'Зал {hall_number}', librarian=librarian)
             hall.save()
 
@@ -250,10 +204,16 @@ class Fills:
                     shelve.save()
 
                     for book_number in range(1, 11):  # 10 книг на полке
+                        agent = Agents.objects.create(fio=f'Автор {book_number}', sex=True)
+
                         book = Book.objects.create(
                             title=f'Книга {hall_number}.{rack_number}.{shelve_number}.{book_number}',
-                            author=f'Автор {book_number}',
+                            number=1,
+                            page_count=1,
+                            publication_date=datetime.now(),
                             shelve=shelve)
+
+                        book.authors.add(agent)
                         book.save()
 
     @classmethod
@@ -292,7 +252,7 @@ class Fills:
         print(f'Книга "{book.title}" успешно взята.')
 
     @classmethod
-    def _return_book(cls,  borrow_record, book):
+    def _return_book(cls, borrow_record, book):
         # Возврат книги
         borrow_record.return_book()
         print(f'Книга "{book.title}" успешно возвращена.')
