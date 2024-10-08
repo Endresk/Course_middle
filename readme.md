@@ -1,4 +1,4 @@
 # Практические задачи
 
-## task_1 - Паттерны
-## task_2 - Django модели
+## path - task_1 - patterns
+## path - task_django - library
