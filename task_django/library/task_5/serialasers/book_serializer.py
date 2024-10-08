@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
 from task_django.library.lib_models.models import Book
-from task_django.library.task_5.serialasers.agents_serializer import AgentsSerializer
+from task_django.library.task_5.serialasers.agent_serializer import AgentSerializer
 from task_django.library.task_5.serialasers.shelve_serializer import ShelveSerializer
 
 
 class BookSerializer(serializers.HyperlinkedModelSerializer):
-    authors = AgentsSerializer()
+    authors = AgentSerializer()
     shelve = ShelveSerializer()
 
     class Meta:

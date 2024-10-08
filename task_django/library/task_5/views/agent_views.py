@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 
 from task_django.library.lib_models.models import Agents
-from task_django.library.task_5.serialasers.agents_serializer import AgentsSerializer
+from task_django.library.task_5.serialasers.agent_serializer import AgentSerializer
 
 
-class AgentsViewSet(viewsets.ModelViewSet):
+class AgentViewSet(viewsets.ModelViewSet):
     queryset = Agents.objects.all()
-    serializer_class = AgentsSerializer
+    serializer_class = AgentSerializer

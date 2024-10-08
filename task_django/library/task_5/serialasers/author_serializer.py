@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
 from task_django.library.lib_models.models import Authors
-from task_django.library.task_5.serialasers.agents_serializer import AgentsSerializer
+from task_django.library.task_5.serialasers.agent_serializer import AgentSerializer
 
 
-class AuthorsSerializer(serializers.HyperlinkedModelSerializer):
-    user = AgentsSerializer()
+class AuthorSerializer(serializers.HyperlinkedModelSerializer):
+    user = AgentSerializer()
 
     class Meta:
         model = Authors
