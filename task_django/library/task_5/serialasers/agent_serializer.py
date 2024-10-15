@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from task_django.library.lib_models.models import Agents
+from task_django.library.lib_models.models import Agent
 
 
 class AgentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Agents
+        model = Agent
         fields = (
             'id',
             'url',

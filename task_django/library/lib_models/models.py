@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
-class Agents(models.Model):
+class Agent(models.Model):
     fio = models.CharField("ФИО", max_length=255)
     birth_date = models.DateField(verbose_name="Дата рождения", blank=True, null=True)
     sex = models.BooleanField(verbose_name="Пол")
@@ -17,22 +17,22 @@ class Agents(models.Model):
         verbose_name_plural = 'Контрагенты'
 
 
-class Authors(models.Model):
-    user = models.OneToOneField(Agents, verbose_name="Автор", on_delete=models.PROTECT)
+class Author(models.Model):
+    user = models.OneToOneField(Agent, verbose_name="Автор", on_delete=models.PROTECT)
     biography = models.TextField(verbose_name="Биография>", blank=True)
 
     def __str__(self):
         return f"{self.user}"
 
     class Meta:
-        db_table = 'authors'
+        db_table = 'author'
         verbose_name = 'Автор'
         verbose_name_plural = 'Авторы'
 
 
 class Hall(models.Model):
     name = models.CharField('Название зала', max_length=100)
-    librarian = models.ForeignKey(Agents, verbose_name="Библиотекарь", on_delete=models.PROTECT)
+    librarian = models.ForeignKey(Agent, verbose_name="Библиотекарь", on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -73,7 +73,7 @@ class Shelve(models.Model):
 
 class Book(models.Model):
     title = models.CharField('Название книги', max_length=200)
-    authors = models.ManyToManyField(Agents, verbose_name='Авторы книги', max_length=100)
+    author = models.ManyToManyField(Agent, verbose_name='Авторы книги', max_length=100)
     publication_type = models.CharField('Вид издания', max_length=50)
     number = models.PositiveIntegerField("Номер издания")
     page_count = models.PositiveSmallIntegerField('Количество страниц')
@@ -101,7 +101,7 @@ class Book(models.Model):
 
 
 class Reader(models.Model):
-    user = models.OneToOneField(Agents, on_delete=models.PROTECT)
+    user = models.OneToOneField(Agent, on_delete=models.PROTECT)
     borrowed_books = models.ManyToManyField(Book)
     registration_date = models.DateTimeField("Дата регистрация читателя", auto_now_add=True)
 
