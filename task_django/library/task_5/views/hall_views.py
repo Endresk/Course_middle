@@ -9,4 +9,4 @@ class HallViewSet(viewsets.ModelViewSet):
     serializer_class = HallSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
-    ordering_fields = ['name', 'id']
+    ordering_fields = ['name']

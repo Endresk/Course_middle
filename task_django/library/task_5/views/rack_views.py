@@ -9,4 +9,4 @@ class RackViewSet(viewsets.ModelViewSet):
     serializer_class = RackSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['number']
-    ordering_fields = ['number', 'id']
+    ordering_fields = ['number']

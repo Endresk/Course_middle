@@ -9,4 +9,4 @@ class BookLocationViewSet(viewsets.ModelViewSet):
     serializer_class = BookLocationSerializer
     filter_backends = [filters.OrderingFilter]
     search_fields = ['book']
-    ordering_fields = ['book', 'id']
+    ordering_fields = ['book']

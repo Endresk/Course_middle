@@ -8,5 +8,5 @@ class ReaderViewSet(viewsets.ModelViewSet):
     queryset = Reader.objects.all()
     serializer_class = ReaderSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['user__fio', 'id']
-    ordering_fields = ['user__fio', 'id']
+    search_fields = ['user__fio']
+    ordering_fields = ['user__fio']
