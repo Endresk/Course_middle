@@ -16,6 +16,11 @@ class RackSerializer(serializers.HyperlinkedModelSerializer):
             'hall',
         )
 
+    @staticmethod
+    def shelve(obj):
+        shelves = obj.shelve.all()
+        return ', '.join(shelve.number for shelve in shelves)
+
     def create(self, validated_data: dict):
         """
 
