@@ -16,6 +16,10 @@ class HallSerializer(serializers.HyperlinkedModelSerializer):
             'librarian',
         )
 
+    @staticmethod
+    def _rack(obj):
+        return ', '.join(rack.number for rack in obj.racks.all())
+
     def create(self, validated_data: dict):
         """
 
